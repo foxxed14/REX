@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REX's chat</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput').value;
+            if (!userInput.trim()) return;
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ message: userInput })
+            });
+            const data = await response.json();
+            const chatOutput = document.getElementById('chatOutput');
+            if (data.error) {
+                chatOutput.innerHTML += `<div class="message error-message"><strong>Error:</strong> ${data.error}</div>`;
+            } else {
+                chatOutput.innerHTML += `<div class="message user-message"><strong>You:</strong> ${userInput}</div>`;
+                chatOutput.innerHTML += `<div class="message bot-message"><strong>REX:</strong> ${data.response}</div>`;
+            }
+            document.getElementById('userInput').value = '';
+            chatOutput.scrollTop = chatOutput.scrollHeight;
+        }
+    </script>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>REX's CHAT</h1>
+        <div id="chatOutput" class="chat-output"></div>
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</body>
+</html>
